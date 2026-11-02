@@ -1,0 +1,63 @@
+diff --git a/src/main/drivers/accgyro/accgyro_virtual.c b/src/main/drivers/accgyro/accgyro_virtual.c
+index df771f6..bb93887 100644
+--- a/src/main/drivers/accgyro/accgyro_virtual.c
++++ b/src/main/drivers/accgyro/accgyro_virtual.c
+@@ -94,6 +94,7 @@ bool virtualGyroDetect(gyroDev_t *gyro)
+     gyro->readFn = virtualGyroRead;
+     gyro->temperatureFn = virtualGyroReadTemperature;
+ #if defined(SIMULATOR_BUILD)
++    gyro->mpuDetectionResult.sensor = BMI_270_SPI;
+     gyro->scale = GYRO_SCALE_2000DPS;
+ #else
+     gyro->scale = 1.0f;
+diff --git a/src/main/pg/pg.h b/src/main/pg/pg.h
+index d7a2333..32bae18 100644
+--- a/src/main/pg/pg.h
++++ b/src/main/pg/pg.h
+@@ -72,6 +72,14 @@ extern const pgRegistry_t __pg_registry_end[] __asm("section$end$__DATA$__pg_reg
+ extern const uint8_t __pg_resetdata_start[] __asm("section$start$__DATA$__pg_resetdata");
+ extern const uint8_t __pg_resetdata_end[] __asm("section$end$__DATA$__pg_resetdata");
+ #define PG_RESETDATA_ATTRIBUTES __attribute__ ((section("__DATA,__pg_resetdata"), used, aligned(2)))
++#elif defined(__wasm__)
++extern const pgRegistry_t __pg_registry_start[] __asm("__start_pg_registry");
++extern const pgRegistry_t __pg_registry_end[] __asm("__stop_pg_registry");
++#define PG_REGISTER_ATTRIBUTES __attribute__ ((section("pg_registry"), used, aligned(4)))
++
++extern const uint8_t __pg_resetdata_start[] __asm("__start_pg_resetdata");
++extern const uint8_t __pg_resetdata_end[] __asm("__stop_pg_resetdata");
++#define PG_RESETDATA_ATTRIBUTES __attribute__ ((section("pg_resetdata"), used, aligned(2)))
+ #else
+ extern const pgRegistry_t __pg_registry_start[];
+ extern const pgRegistry_t __pg_registry_end[];
+diff --git a/src/main/target/SITL/target.h b/src/main/target/SITL/target.h
+index 6032570..191aad2 100644
+--- a/src/main/target/SITL/target.h
++++ b/src/main/target/SITL/target.h
+@@ -43,9 +43,6 @@
+ #define DMA_DATA
+ #define STATIC_DMA_DATA_AUTO
+ 
+-// use simulatior's attitude directly
+-// disable this if wants to test AHRS algorithm
+-#undef USE_IMU_CALC
+ 
+ //#define SIMULATOR_ACC_SYNC
+ //#define SIMULATOR_GYRO_SYNC
+diff --git a/src/main/fc/rc_controls.c b/src/main/fc/rc_controls.c
+--- a/src/main/fc/rc_controls.c
++++ b/src/main/fc/rc_controls.c
+@@ -234,10 +234,13 @@
+ 
+     #ifdef USE_USB_CDC_HID
+     // If this target is used as a joystick, we should leave here.
+-    if (cdcDeviceIsMayBeActive() || IS_RC_MODE_ACTIVE(BOXSTICKCOMMANDDISABLE)) {
++    if (cdcDeviceIsMayBeActive()) {
+         return;
+     }
+     #endif
++    if (IS_RC_MODE_ACTIVE(BOXSTICKCOMMANDDISABLE)) {
++        return;
++    }
+ 
+     // actions during not armed
+ 

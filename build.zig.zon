@@ -1,0 +1,22 @@
+.{
+    .name = .fpv_rook_web_betaflight,
+    .version = "0.0.1",
+    .dependencies = .{
+        .betaflight = .{
+            .url = "https://github.com/betaflight/betaflight/archive/0e533ba76cb9129458578f7fa2134df1449596ba.tar.gz",
+            .hash = "N-V-__8AAO6NLwn-4wqqJ3GWAqF6oM0iHC9TEH7hrLg0Egj2",
+        },
+    },
+    .fingerprint = 0x13e9b6feb2d64fb4,
+    .minimum_zig_version = "0.16.0",
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "LICENSE",
+        "0e533ba.patch",
+        "platform.c",
+        "dyad_stub.c",
+        "srcs.txt",
+        "bf.ts",
+    },
+}
