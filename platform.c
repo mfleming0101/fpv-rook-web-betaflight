@@ -1,17 +1,8 @@
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "platform.h"
 
-#include "drivers/io.h"
-#include "drivers/motor.h"
 #include "drivers/system.h"
 #include "drivers/pwm_output.h"
-#include "drivers/time.h"
 #include "drivers/accgyro/accgyro_virtual.h"
-#include "config/config.h"
 #include "fc/core.h"
 #include "fc/init.h"
 #include "fc/rc_modes.h"
@@ -41,7 +32,6 @@ void systemInit(void)
 
 void systemReset(void)
 {
-    printf("[system]Reset!\n");
     __builtin_trap();
 }
 
@@ -57,27 +47,19 @@ void timerInit(void)
 
 void failureMode(failureMode_e mode)
 {
-    printf("[failureMode]!!! %d\n", mode);
+    UNUSED(mode);
     __builtin_trap();
 }
 
 void indicateFailure(failureMode_e mode, int repeatCount)
 {
+    UNUSED(mode);
     UNUSED(repeatCount);
-    printf("Failure LED flash for: [failureMode]!!! %d\n", mode);
 }
 
-uint64_t nanos64_real(void) { return nowUs * 1000; }
-uint64_t micros64_real(void) { return nowUs; }
-uint64_t millis64_real(void) { return nowUs / 1000; }
-uint64_t micros64(void) { return nowUs; }
-uint64_t millis64(void) { return nowUs / 1000; }
 uint32_t micros(void) { return (uint32_t)nowUs; }
 uint32_t millis(void) { return (uint32_t)(nowUs / 1000); }
 
-int32_t clockCyclesToMicros(int32_t clockCycles) { return clockCycles; }
-int32_t clockCyclesTo10thMicros(int32_t clockCycles) { return clockCycles; }
-int32_t clockCyclesTo100thMicros(int32_t clockCycles) { return clockCycles; }
 uint32_t clockMicrosToCycles(uint32_t us) { return us; }
 
 uint32_t getCycleCounter(void)
@@ -86,26 +68,9 @@ uint32_t getCycleCounter(void)
 }
 
 void delayMicroseconds(uint32_t us) { nowUs += us; }
-void delayMicroseconds_real(uint32_t us) { nowUs += us; }
 void delay(uint32_t ms) { nowUs += (uint64_t)ms * 1000; }
 
 pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
-
-void servoDevInit(const servoDevConfig_t *servoConfig)
-{
-    UNUSED(servoConfig);
-}
-
-void pwmWriteServo(uint8_t index, float value)
-{
-    UNUSED(index);
-    UNUSED(value);
-}
-
-pwmOutputPort_t *pwmGetMotors(void)
-{
-    return motors;
-}
 
 bool pwmIsMotorEnabled(uint8_t index)
 {
@@ -153,12 +118,6 @@ motorDevice_t *motorPwmDevInit(const motorDevConfig_t *motorConfig, uint16_t idl
     return &motorPwmDevice;
 }
 
-uint16_t adcGetChannel(uint8_t channel)
-{
-    UNUSED(channel);
-    return 0;
-}
-
 char _estack;
 char _Min_Stack_Size;
 
@@ -175,7 +134,6 @@ FLASH_Status FLASH_ProgramWord(uintptr_t addr, uint32_t value)
 }
 
 void IOConfigGPIO(IO_t io, ioConfig_t cfg) { UNUSED(io); UNUSED(cfg); }
-void spektrumBind(rxConfig_t *rxConfig) { UNUSED(rxConfig); }
 void debugInit(void) { }
 void unusedPinsInit(void) { }
 void IOHi(IO_t io) { UNUSED(io); }
@@ -331,8 +289,6 @@ EXPORT(bf_flight_mode) uint32_t bfFlightMode(void)
 {
     return flightModeFlags;
 }
-
-#include "pg/pg.h"
 
 EXPORT(bf_pg_count) uint32_t bfPgCount(void)
 {
