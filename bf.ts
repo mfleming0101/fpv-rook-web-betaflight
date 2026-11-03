@@ -17,7 +17,6 @@ interface Exports {
   bf_flight_mode(): number
   bf_held(): number
   bf_hold(): void
-  bf_angle_limit(degrees: number): void
 }
 
 export interface Fc {
@@ -83,7 +82,6 @@ export interface FlightController {
   radio(us: number[]): void
   motor(index: number): number
   hold(): void
-  angleLimit(degrees?: number): void
   armed(): boolean
   held(): boolean
   angle(): boolean
@@ -98,7 +96,6 @@ const reasons: [Block, number][] = [
 
 export function controller(fc: Fc, cli: string): FlightController {
   configure(fc, cli)
-  const limit = +cli.match(/angle_limit = (\d+)/)![1]
   const known = reasons.reduce((all, [, bits]) => all | bits, 1 << 31)
   return {
     step: fc.step,
@@ -109,7 +106,6 @@ export function controller(fc: Fc, cli: string): FlightController {
     },
     motor: (i) => fc.e.bf_motor(i),
     hold: () => fc.e.bf_hold(),
-    angleLimit: (degrees = limit) => fc.e.bf_angle_limit(degrees),
     armed: () => fc.e.bf_arming() >>> 31 === 1,
     held: () => !!fc.e.bf_held(),
     angle: () => !!(fc.e.bf_flight_mode() & 1),

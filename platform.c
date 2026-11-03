@@ -17,7 +17,6 @@
 #include "fc/rc_modes.h"
 #include "fc/runtime_config.h"
 #include "flight/imu.h"
-#include "flight/pid.h"
 #include "rx/rx.h"
 #include "scheduler/scheduler.h"
 
@@ -331,11 +330,6 @@ EXPORT(bf_arming) uint32_t bfArming(void)
 EXPORT(bf_flight_mode) uint32_t bfFlightMode(void)
 {
     return flightModeFlags;
-}
-
-EXPORT(bf_angle_limit) void bfAngleLimit(uint8_t degrees)
-{
-    currentPidProfile->angle_limit = degrees;
 }
 
 #include "pg/pg.h"
