@@ -11,9 +11,7 @@ src/main/pg/pg.c
 src/main/pg/rcdevice.c
 src/main/pg/rx.c
 src/main/pg/scheduler.c
-src/main/pg/serial_uart.c
 src/main/pg/stats.c
-src/main/pg/vcd.c
 src/main/common/bitarray.c
 src/main/common/crc.c
 src/main/common/filter.c
@@ -37,7 +35,6 @@ src/main/drivers/dshot.c
 src/main/drivers/buf_writer.c
 src/main/drivers/bus.c
 src/main/drivers/io.c
-src/main/drivers/light_led.c
 src/main/drivers/motor.c
 src/main/drivers/serial.c
 src/main/drivers/stack_check.c
